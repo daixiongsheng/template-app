@@ -1,0 +1,9 @@
+version: '3'
+services:
+  feishu-bot-app:
+    build:
+      context: .
+      args:
+        GIT_TOKEN: ${GIT_TOKEN} # 通过环境变量传入个人访问令牌
+    ports:
+      - '6700:6700' # 根据实际应用监听端口进行调整
