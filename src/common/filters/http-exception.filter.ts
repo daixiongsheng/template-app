@@ -11,6 +11,8 @@ import {
 export class HttpExceptionFilter implements ExceptionFilter {
   private readonly logger = new Logger(HttpExceptionFilter.name);
 
+  skipStackStatuses = [404];
+
   catch(exception: Error, host: ArgumentsHost) {
     const ctx = host.switchToHttp();
     const request = ctx.getRequest();
@@ -32,8 +34,9 @@ export class HttpExceptionFilter implements ExceptionFilter {
     // 将异常记录到logger中
     this.logger.error(
       `${request.method} ${request.url} status:${status} query:${JSON.stringify(request.query)} body:${JSON.stringify(request.body)}`,
-      exception.stack,
+      this.skipStackStatuses.includes(status) ? null : exception.stack,
     );
+
     // 设置返回的状态码， 请求头，发送错误信息
     response.status(status);
     response.header('Content-Type', 'application/json; charset=utf-8');
