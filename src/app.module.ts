@@ -5,9 +5,11 @@ import { WinstonModule } from 'nest-winston';
 import { winstonLogger } from './app.logger';
 import { LoggerMiddleware } from './common/middleware/logger/logger.middleware';
 import { MainModule } from './modules/main/main.module';
+import { HttpModule } from './modules/http/http.module';
 
 @Module({
   imports: [
+    HttpModule,
     MainModule,
     TaskModule,
     ScheduleModule.forRoot(),
