@@ -2,6 +2,7 @@ import 'winston-daily-rotate-file';
 import { transports, format } from 'winston';
 import { WinstonModule, utilities } from 'nest-winston';
 import { appName } from './app.config';
+import { isDev, isProd } from './config/env';
 
 export function createLogger() {
   const baseFormat = format.combine(
@@ -18,30 +19,33 @@ export function createLogger() {
   return WinstonModule.createLogger({
     level: 'info',
     transports: [
-      new transports.Console({
-        format: baseFormat,
-      }),
-      new transports.DailyRotateFile({
-        format: format.combine(baseFormat, format.uncolorize()),
-        level: 'info',
-        dirname: 'logs',
-        filename: '%DATE%.log',
-        datePattern: 'YYYY-MM-DD',
-        zippedArchive: true,
-        maxSize: '20m',
-        maxFiles: '14d',
-      }),
-      new transports.DailyRotateFile({
-        format: format.combine(baseFormat, format.uncolorize()),
-        level: 'error',
-        dirname: 'logs',
-        filename: '%DATE%.error.log',
-        datePattern: 'YYYY-MM-DD',
-        zippedArchive: true,
-        maxSize: '20m',
-        maxFiles: '14d',
-      }),
-    ],
+      isDev &&
+        new transports.Console({
+          format: baseFormat,
+        }),
+      isProd &&
+        new transports.DailyRotateFile({
+          format: format.combine(baseFormat, format.uncolorize()),
+          level: 'info',
+          dirname: 'logs',
+          filename: '%DATE%.log',
+          datePattern: 'YYYY-MM-DD',
+          zippedArchive: true,
+          maxSize: '20m',
+          maxFiles: '14d',
+        }),
+      isProd &&
+        new transports.DailyRotateFile({
+          format: format.combine(baseFormat, format.uncolorize()),
+          level: 'error',
+          dirname: 'logs',
+          filename: '%DATE%.error.log',
+          datePattern: 'YYYY-MM-DD',
+          zippedArchive: true,
+          maxSize: '20m',
+          maxFiles: '14d',
+        }),
+    ].filter(Boolean),
   });
 }
 
